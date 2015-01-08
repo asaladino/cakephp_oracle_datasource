@@ -1,0 +1,26 @@
+{
+    "name": "asaladino/oracle_datasource",
+    "description": "CakePHP Oracle Datasource",
+    "type": "cakephp-plugin",
+    "keywords": ["cakephp", "datasource", "oracle", "oci8", "oci"],
+    "homepage": "https://github.com/asaladino/cakephp_oracle_datasource",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adam Saladino",
+            "homepage": "http://codingsimply.com",
+            "role": "Author"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/asaladino/cakephp_oracle_datasource/issues",
+        "source": "https://github.com/asaladino/cakephp_oracle_datasource"
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "jasig/phpcas": ">=1.3.0"
+    },
+    "extra": {
+        "installer-name": "OracleDatasource"
+    }
+}
