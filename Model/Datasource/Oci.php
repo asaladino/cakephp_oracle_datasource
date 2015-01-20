@@ -49,13 +49,20 @@ class Oci extends DboSource {
     public $alias = ' ';
 
     /**
+     * Name of the table, grabbed from the model.
+     * 
+     * @var string
+     */
+    private $table = '';
+
+    /**
      * An array of base configuration settings to be used if settings are not
      * provided, i.e. default host, port, and connection method.
      * 
      * @var array
      */
     protected $_baseConfig = array(
-        'persistent' => true,
+        'persistent' => false,
         'login' => 'oracleinst1',
         'password' => '',
         'sid' => '',
@@ -148,7 +155,7 @@ class Oci extends DboSource {
      * @return boolean
      */
     public function enabled() {
-        return extension_loaded('oci'.$this->config['driver_version']);
+        return extension_loaded('oci' . $this->config['driver_version']);
     }
 
     /**
@@ -169,6 +176,7 @@ class Oci extends DboSource {
      * @return resource Result resource identifier
      */
     protected function _execute($sql, $params = array(), $prepareOptions = array()) {
+        $this->_rawResults = [];
         $stid = oci_parse($this->connection, $sql);
         oci_execute($stid);
         return $stid;
@@ -204,6 +212,7 @@ class Oci extends DboSource {
      * @return array of fields in table. Keys are name and type
      */
     public function describe($model) {
+        $this->table = $model->table;
         $cache = parent::describe($model);
         if ($cache != null) {
             return $cache;
@@ -214,7 +223,7 @@ class Oci extends DboSource {
         while (($entry = oci_fetch_array($resource, OCI_ASSOC + OCI_RETURN_NULLS)) != false) {
             $fields[strtolower($entry['COLUMN_NAME'])] = array(
                 'type' => $this->column(strtolower($entry['DATA_TYPE'])),
-                'null' => $entry['NULLABLE'],
+                'null' => $entry['NULLABLE'] === 'Y',
                 'default' => $entry['DATA_DEFAULT'],
                 'length' => $entry['DATA_LENGTH']
             );
@@ -376,9 +385,12 @@ class Oci extends DboSource {
      */
     private function setRawResults() {
         if ($this->_result && empty($this->_rawResults)) {
+            $debug = Configure::read('debug');
+            Configure::write('debug', 0);
             while (($entry = oci_fetch_array($this->_result, OCI_ASSOC + OCI_RETURN_NULLS)) != false) {
                 $this->_rawResults[] = $entry;
             }
+            Configure::write('debug', $debug);
         }
     }
 
@@ -421,7 +433,6 @@ class Oci extends DboSource {
             if (!strpos(strtolower($limit), 'rownum') || strpos(strtolower($limit), 'rownum') === 0) {
                 $rt = sprintf('ROWNUM =< %d AND ROWNUM > %d', $offset, ($limit + $offset));
             }
-            pr($rt);
             return $rt;
         }
         return null;
@@ -467,14 +478,9 @@ class Oci extends DboSource {
     public function resultSet($results) {
         $this->currentRow = 0;
         $this->map = array();
-        $table = '';
-        foreach ($this->_descriptions as $tableName => $description) {
-            $table = Inflector::classify($tableName);
-            break;
-        }
         foreach ($this->_rawResults as $key => $row) {
             foreach ($row as $field => $value) {
-                $this->map[] = array($table, strtolower($field));
+                $this->map[] = array($this->table, strtolower($field));
             }
             break;
         }
