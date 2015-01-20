@@ -1,5 +1,3 @@
-# CakePHP Oracle Datasource
-
 Connect to an Oracle database using the OCI* PHP extension.
 
 ## Requirements
@@ -37,6 +35,7 @@ _[Enable]_
 
 Add `CakePlugin::loadAll();` to `bootstrap.php` then implement in database.php and a model.
 
+__[database.php]__
 ```php
 class DATABASE_CONFIG {
     public $oracle = array(
@@ -53,6 +52,7 @@ class DATABASE_CONFIG {
 }
 ```
 
+__[Your Model]__
 ```php
 App::uses('AppModel', 'Model');
 
