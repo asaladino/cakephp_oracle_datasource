@@ -3,7 +3,7 @@
     "description": "CakePHP Oracle Datasource",
     "type": "cakephp-plugin",
     "keywords": ["cakephp", "datasource", "oracle", "oci8", "oci"],
-    "homepage": "https://github.com/asaladino/cakephp_oracle_datasource",
+    "homepage": "http://codingsimply.com/projects/cakephp-oracle-oci8-datasource",
     "license": "MIT",
     "authors": [
         {
